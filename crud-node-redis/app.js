@@ -85,15 +85,14 @@ app.get('/api/genres/:genre_type', (req, res) => {
 app.delete('/api/genres/:id', (req, res) => {
     const genre = "";
     redis_cli.hgetall("Genres_" + req.params.id, (err, obj) => {
-        if(err) return err;
+        if(err) return res.status(404).send("The genre with given id connot find");  
         else {
-            obj.Id = req.params.id;
-            this.genre = obj;
+            redis_cli.del("Genres_" + req.params.id, (error, result) => {
+                if(error) return res.send(error);
+                else return res.send(obj);
+            });
         }
     });
-    if(!this.genre || this.genre == "") return res.status(404).send("The genre with given id connot find");  
-    redis_cli.DEL(req.params.id);
-    return res.send(this.genre);
 });
 
 //Get all are availlable genres 
